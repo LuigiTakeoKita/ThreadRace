@@ -8,13 +8,15 @@ public class RaceCar extends Car implements Runnable{
 	public RaceCar(Car car) {
 		super(car.getName(), car.getMinSpeed(), car.getMaxSpeed());
 	}
-	public RaceCar(String name, int minSpeed, int maxSpeed, int[] track, int laps) {
+	public RaceCar(String name, int minSpeed, int maxSpeed, int[] track, int laps, RaceListener raceListener) {
 		super(name, minSpeed, maxSpeed);
 		this.track = track;
 		this.laps = laps;
+		this.raceListener = raceListener;
 	}
 	private int[] track;
 	private int laps;
+	private RaceListener raceListener;
 	public int[] getTrack() {
 		return track;
 	}
@@ -27,6 +29,12 @@ public class RaceCar extends Car implements Runnable{
 	public void setLaps(int laps) {
 		this.laps = laps;
 	}
+	public RaceListener getRaceListener() {
+		return raceListener;
+	}
+	public void setRaceListener(RaceListener raceListener) {
+		this.raceListener = raceListener;
+	}
 	@Override
 	public void run() {
 		Random random = new Random();
@@ -37,9 +45,9 @@ public class RaceCar extends Car implements Runnable{
 		while(running) {
 			speed = random.nextInt((getMaxSpeed() - getMinSpeed()) + 1) + getMinSpeed();
 			System.out.println("| Car: "+getName()+" | Lap: "+currentLap+" | Sector: "+sector+" | Max Speed on this Sector: "+getTrack()[sector-1]+" | Speed: "+speed+" |");
-			if(speed > getTrack()[sector-1]) { // caso a velocidade seja maior q o valor max do setor o carro irá bater e será recolocado na pista
+			if(speed > getTrack()[sector-1]) { // Caso a velocidade seja maior que o valor máximo do setor o carro irá bater e será recolocado na pista
 				try {
-					System.out.println("Respawning car");
+					System.out.println("Replacing car");
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -51,11 +59,12 @@ public class RaceCar extends Car implements Runnable{
 				currentLap++;
 			}
 			if(currentLap > getLaps()) {
-				break; // win
+				break; // Finalizou a corrida
 			}
 			Thread.currentThread();
 			Thread.yield();
 		}
 		System.out.println(getName()+ " Finished");
+		getRaceListener().RaceFinished(getName());
 	}
 }

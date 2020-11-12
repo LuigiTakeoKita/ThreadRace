@@ -1,6 +1,6 @@
 package DTO;
 
-public class Race {
+public class Race implements RaceListener{
 	public Race(Car[] cars, int[] track, int laps) {
 		super();
 		this.cars = cars;
@@ -9,7 +9,8 @@ public class Race {
 	}
 	private Car[] cars;
 	private int[] track;
-	private int laps; 
+	private int laps;
+	private String winner;
 	public Car[] getCars() {
 		return cars;
 	}
@@ -28,16 +29,24 @@ public class Race {
 	public void setLaps(int laps) {
 		this.laps = laps;
 	}
+	public String getWinner() {
+		return winner;
+	}
+	public void setWinner(String winner) {
+		this.winner = winner;
+	}
 	public String startRace() {
-		String winner = "";
 		Thread[] carsT = new Thread[getCars().length];
-		for (int i = 0; i < getCars().length; i++) {
+		for (int i = 0; i < getCars().length; i++) { // Criação das Threads
 			RaceCar c = new RaceCar(getCars()[i]);
 			c.setTrack(getTrack());
 			c.setLaps(getLaps());
+			c.setRaceListener(this);
 			carsT[i] = new Thread(c);
 		}
-		for (Thread c : carsT) {
+		setWinner("");
+		System.out.println("Starting Race");
+		for (Thread c : carsT) { // Iniciação das Threads
 			c.start();
 		}
 		try {
@@ -47,6 +56,14 @@ public class Race {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		return winner;
+		return getWinner();
+	}
+	@Override
+	public void RaceFinished(String car) {
+		synchronized (this) {
+			if(getWinner().equals("")) {
+				setWinner(car);
+			}
+		}
 	}
 }
