@@ -1,16 +1,19 @@
 package DTO;
 
 public class Race implements RaceListener{
-	public Race(Car[] cars, int[] track, int laps) {
+	public Race(Car[] cars, int[] track, int laps, int replaceTime) {
 		super();
 		this.cars = cars;
 		this.track = track;
 		this.laps = laps;
+		this.replaceTime = replaceTime;
+		this.finishedPos = new String[cars.length];
 	}
 	private Car[] cars;
 	private int[] track;
 	private int laps;
-	private String winner;
+	private int replaceTime;
+	private String[] finishedPos;
 	public Car[] getCars() {
 		return cars;
 	}
@@ -29,22 +32,31 @@ public class Race implements RaceListener{
 	public void setLaps(int laps) {
 		this.laps = laps;
 	}
-	public String getWinner() {
-		return winner;
+	public int getReplaceTime() {
+		return replaceTime;
 	}
-	public void setWinner(String winner) {
-		this.winner = winner;
+	public void setReplaceTime(int replaceTime) {
+		this.replaceTime = replaceTime;
 	}
-	public String startRace() {
+	public String[] getFinishedPos() {
+		return finishedPos;
+	}
+	public void setFinishedPos(String[] finishedPos) {
+		this.finishedPos = finishedPos;
+	}
+	public void setFinishedPos(String car, int pos) {
+		this.finishedPos[pos] = car;
+	}
+	public String[] startRace() {
 		Thread[] carsT = new Thread[getCars().length];
 		for (int i = 0; i < getCars().length; i++) { // Criação das Threads
 			RaceCar c = new RaceCar(getCars()[i]);
 			c.setTrack(getTrack());
 			c.setLaps(getLaps());
+			c.setReplaceTime(getReplaceTime());
 			c.setRaceListener(this);
 			carsT[i] = new Thread(c);
 		}
-		setWinner("");
 		System.out.println("Starting Race");
 		for (Thread c : carsT) { // Iniciação das Threads
 			c.start();
@@ -56,13 +68,13 @@ public class Race implements RaceListener{
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		return getWinner();
+		return getFinishedPos();
 	}
-	@Override
-	public void RaceFinished(String car) {
-		synchronized (this) {
-			if(getWinner().equals("")) {
-				setWinner(car);
+	public synchronized void RaceFinished(String car) {
+		for (int i = 0; i < getCars().length; i++) {
+			if(getFinishedPos()[i]  == null) {
+				setFinishedPos(car, i);
+				break;
 			}
 		}
 	}

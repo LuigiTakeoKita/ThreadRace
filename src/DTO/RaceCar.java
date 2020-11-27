@@ -8,14 +8,16 @@ public class RaceCar extends Car implements Runnable{
 	public RaceCar(Car car) {
 		super(car.getName(), car.getMinSpeed(), car.getMaxSpeed());
 	}
-	public RaceCar(String name, int minSpeed, int maxSpeed, int[] track, int laps, RaceListener raceListener) {
+	public RaceCar(String name, int minSpeed, int maxSpeed, int[] track, int laps, int replaceTime, RaceListener raceListener) {
 		super(name, minSpeed, maxSpeed);
 		this.track = track;
 		this.laps = laps;
+		this.replaceTime = replaceTime;
 		this.raceListener = raceListener;
 	}
 	private int[] track;
 	private int laps;
+	private int replaceTime;
 	private RaceListener raceListener;
 	public int[] getTrack() {
 		return track;
@@ -28,6 +30,12 @@ public class RaceCar extends Car implements Runnable{
 	}
 	public void setLaps(int laps) {
 		this.laps = laps;
+	}
+	public int getReplaceTime() {
+		return replaceTime;
+	}
+	public void setReplaceTime(int replaceTime) {
+		this.replaceTime = replaceTime;
 	}
 	public RaceListener getRaceListener() {
 		return raceListener;
@@ -45,10 +53,11 @@ public class RaceCar extends Car implements Runnable{
 		while(running) {
 			speed = random.nextInt((getMaxSpeed() - getMinSpeed()) + 1) + getMinSpeed();
 			System.out.println("| Car: "+getName()+" | Lap: "+currentLap+" | Sector: "+sector+" | Max Speed on this Sector: "+getTrack()[sector-1]+" | Speed: "+speed+" |");
-			if(speed > getTrack()[sector-1]) { // Caso a velocidade seja maior que o valor máximo do setor o carro irá bater e será recolocado na pista
+			// Caso a velocidade seja maior que o valor máximo do setor o carro irá bater e será recolocado na pista
+			if(speed > getTrack()[sector-1]) { 
 				try {
-					System.out.println("Replacing car");
-					Thread.sleep(100);
+					System.out.println("Replacing Car: "+getName());
+					Thread.sleep(getReplaceTime());
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
