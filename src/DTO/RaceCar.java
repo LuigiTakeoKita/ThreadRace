@@ -8,40 +8,69 @@ public class RaceCar extends Car implements Runnable{
 	public RaceCar(Car car) {
 		super(car.getName(), car.getMinSpeed(), car.getMaxSpeed());
 	}
-	public RaceCar(String name, int minSpeed, int maxSpeed, int[] track, int laps, int replaceTime, RaceListener raceListener) {
-		super(name, minSpeed, maxSpeed);
-		this.track = track;
-		this.laps = laps;
-		this.replaceTime = replaceTime;
-		this.raceListener = raceListener;
-	}
 	private int[] track;
 	private int laps;
 	private int replaceTime;
+	private int lapsToPitstop;
 	private RaceListener raceListener;
 	public int[] getTrack() {
 		return track;
 	}
 	public void setTrack(int[] track) {
-		this.track = track;
+		boolean flag = true;
+		for (int i : track) {
+			if(i<0) {
+				flag = false;
+				this.track = new int[] {6,2,6,2};
+				break;
+			}
+		}
+		if (flag) {
+			this.track = track;
+		}
 	}
 	public int getLaps() {
 		return laps;
 	}
 	public void setLaps(int laps) {
-		this.laps = laps;
+		if(laps>0) {
+			this.laps = laps;
+		}else {
+			this.laps = 1;
+		}
 	}
 	public int getReplaceTime() {
 		return replaceTime;
 	}
 	public void setReplaceTime(int replaceTime) {
-		this.replaceTime = replaceTime;
+		if(replaceTime>0) {
+			this.replaceTime = replaceTime;
+		}else {
+			this.replaceTime = 1;
+		}
+	}
+	public int getLapsToPitstop() {
+		return lapsToPitstop;
+	}
+	public void setLapsToPitstop(int lapsToPitstop) {
+		if(lapsToPitstop>0) {
+			this.lapsToPitstop = lapsToPitstop;
+		}else {
+			this.lapsToPitstop = 1;
+		}
 	}
 	public RaceListener getRaceListener() {
 		return raceListener;
 	}
 	public void setRaceListener(RaceListener raceListener) {
 		this.raceListener = raceListener;
+	}
+	public void setRace(int[] track, int laps, int replaceTime, int lapsToPitstop, RaceListener raceListener) {
+		setTrack(track);
+		setLaps(laps);
+		setReplaceTime(replaceTime);
+		setLapsToPitstop(lapsToPitstop);
+		setRaceListener(raceListener);
 	}
 	@Override
 	public void run() {
@@ -65,6 +94,15 @@ public class RaceCar extends Car implements Runnable{
 			sector++;
 			if(sector > getTrack().length) {
 				sector = 1;
+				if(currentLap%getLapsToPitstop() == 0) {
+					int pitstopTime = random.nextInt(2000+1) + 1000;
+					try {
+						System.out.println("Pitstop Car: "+getName());
+						Thread.sleep(pitstopTime);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
 				currentLap++;
 			}
 			if(currentLap > getLaps()) {

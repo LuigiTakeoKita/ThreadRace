@@ -14,7 +14,9 @@ public class Main {
 		int[] track = {6,2,6,2};
 		int laps = 5;
 		int replacetime = 1000;
-		Race race = new Race(cars, track, laps, replacetime);
+		// O pitstop acontece após conpletar a um determinado número de voltas
+		int lapsToPitstop = 2; 
+		Race race = new Race(cars, track, laps, replacetime, lapsToPitstop);
 		String[] winner = race.startRace();
 		for (int i = 0; i < winner.length; i++) {
 			System.out.println((i+1)+" - "+winner[i]);
